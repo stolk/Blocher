@@ -20,36 +20,37 @@
 
 
 		<script id="shader-fs" type="x-shader/x-fragment">
-		precision mediump float;
-		uniform vec4 u_Color;
-		uniform float u_Ambient;
-		varying float light;
+			precision mediump float;
+			uniform vec4 u_Color;
+			uniform float u_Ambient;
+			varying float light;
 
-		void main(void) {
-			if (u_Ambient < 1.0)
-			{
-				float l = (1.0-u_Ambient)*light + u_Ambient;
-				gl_FragColor = l * u_Color;
+			void main(void) {
+				if (u_Ambient < 1.0)
+				{
+					float l = (1.0-u_Ambient)*light + u_Ambient;
+					gl_FragColor = l * u_Color;
+				}
+				else
+					gl_FragColor = u_Color;
 			}
-			else
-				gl_FragColor = u_Color;
-		}
 		</script>
 
 
 		<script id="shader-vs" type="x-shader/x-vertex">
-		attribute vec3 Position;
+			attribute vec3 Position;
 	
-		uniform mat4 u_ModelMat;
-		uniform mat4 u_ViewMat;
-		uniform mat4 u_Persp;
+			uniform mat4 u_ModelMat;
+			uniform mat4 u_ViewMat;
+			uniform vec3 u_LightDir;
+			uniform mat4 u_Persp;
 	
-		varying float light;
+			varying float light;
 	
-		void main(void) {
-			light = dot( Position, vec3(1,0,0) );
-		gl_Position = u_Persp * u_ViewMat * u_ModelMat * vec4(Position, 1.0);
-		}
+			void main(void) {
+				light = dot( Position, u_LightDir );
+				gl_Position = u_Persp * u_ViewMat * u_ModelMat * vec4(Position, 1.0);
+			}
 		</script>
 
 
@@ -172,6 +173,7 @@
 		shader_prog.u_PerspLocation = gl.getUniformLocation(shader_prog, "u_Persp");
 		shader_prog.u_ModelMatLocation = gl.getUniformLocation(shader_prog, "u_ModelMat");
 		shader_prog.u_ViewMatLocation = gl.getUniformLocation(shader_prog, "u_ViewMat");
+		shader_prog.u_LightDir = gl.getUniformLocation(shader_prog, "u_LightDir");
 		shader_prog.u_Color = gl.getUniformLocation(shader_prog, "u_Color");
 		shader_prog.u_Ambient = gl.getUniformLocation(shader_prog, "u_Ambient");
 	}
@@ -370,6 +372,51 @@
 	}
 
 
+	var cam;
+	var iMatrix;
+	var mMatrix;
+	var vMatrix;
+	var pMatrix;
+
+
+	var framenr=0;
+	var age=-0.2;
+
+
+	function initMouseHandling(canvas)
+	{
+		var lastX = -1;
+		var lastY = -1;
+		var dragging = false;
+ 
+		canvas.onmousedown = function(ev) {  //Mouse is pressed
+			var x = ev.clientX;
+			var y = ev.clientY;
+			var rect = ev.target.getBoundingClientRect();
+			lastX = x; 
+			lastY = y;
+			dragging = true;
+		}
+ 
+		canvas.onmouseup = function(ev){ //Mouse is released
+			dragging = false;
+		}
+ 
+		canvas.onmousemove = function(ev) { //Mouse is moved
+			var x = ev.clientX;
+			var y = ev.clientY;
+			if(dragging) {
+				var dx = (x - lastX) / canvas.height * 20;
+				var dy = (y - lastY) / canvas.height * 20;
+				if ( dx != 0 || dy != 0 )
+					camera.drag( cam, dx, dy );
+				lastX = x;
+				lastY = y;
+			}
+		}
+	}
+
+
 	function drawBuf( vbo, mat, what )
 	{
 		gl.uniform4f(shader_prog.u_Color, vbo.color[0], vbo.color[1], vbo.color[2], vbo.color[3]);
@@ -379,14 +426,6 @@
 		gl.drawArrays(what, 0, vbo.numItems);
 	}
 
-	var cam;
-	var iMatrix;
-	var mMatrix;
-	var vMatrix;
-	var pMatrix;
-
-	var framenr=0;
-	var age=-0.2;
 
 	function initCam()
 	{
@@ -428,8 +467,6 @@
 		mat4.rotate( iMatrix, ang, ax, rMatrix );
 
 		// Set uniforms.
-		gl.uniformMatrix4fv(shader_prog.u_PerspLocation, false, pMatrix);
-		gl.uniformMatrix4fv(shader_prog.u_ViewMatLocation, false, vMatrix);
 		gl.uniformMatrix4fv(shader_prog.u_ModelMatLocation, false, mMatrix);
 		gl.uniform1f(shader_prog.u_Ambient, 1.0);
 
@@ -611,7 +648,15 @@
 			gate = g;
 			restart();
 		}
+
+		// Update the camera.
+		var m = camera.trf( cam );
+		mat4.inverse(m, vMatrix);
 	
+		gl.uniformMatrix4fv(shader_prog.u_PerspLocation, false, pMatrix);
+		gl.uniformMatrix4fv(shader_prog.u_ViewMatLocation, false, vMatrix);
+		gl.uniform3f(shader_prog.u_LightDir, m[8], m[9], m[10] );
+
 		age += 0.006;
 		var t;
 
@@ -672,6 +717,8 @@
 		initBufferCoil();
 		initBufferCsys();
 		initBufferKets();
+
+		initMouseHandling(canvas);
 
 		vbo_trl0 = initBufferTrail([0,0,1,1]);
 		vbo_trl1 = initBufferTrail([0,0.8,0,1]);

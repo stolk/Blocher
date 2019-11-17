@@ -35,3 +35,24 @@ camera.trf = function(cam)
 };
 
 
+camera.drag = function(cam, dx, dy)
+{
+	var delta = vec3.create();
+	vec3.subtract( cam.pos, cam.coi, delta );
+	var l = vec3.length( delta );
+	var trf = camera.trf( cam );
+	var camx = vec3.create( [ trf[0], trf[1], trf[2] ] );
+	var camy = vec3.create( [ trf[4], trf[5], trf[6] ] );
+	var movementx = vec3.create();
+	var movementy = vec3.create();
+	vec3.scale( camx, -dx, movementx );
+	vec3.scale( camy,  dy, movementy );
+	vec3.add( cam.pos, movementx, cam.pos );
+	vec3.add( cam.pos, movementy, cam.pos );
+	vec3.subtract( cam.pos, cam.coi, delta );
+	var tocam = vec3.create();
+	vec3.normalize( delta, tocam );
+	vec3.scale( tocam, l );
+	vec3.add( cam.coi, tocam, cam.pos );
+}
+
