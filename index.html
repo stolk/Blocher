@@ -417,9 +417,7 @@
 	function handleTouchMove(ev) {
 		var x = ev.touches[0].clientX;
 		var y = ev.touches[0].clientY;
-		if ( dragging) {
-			drag(canvas, x, y);
-		}
+		drag(canvas, x, y);
 	}
 
 
