@@ -382,14 +382,27 @@
 	var framenr=0;
 	var age=-0.2;
 
+	
+	var lastX = -1;
+	var lastY = -1;
+	var dragging = false;
+
+
+	function drag(canvas, x, y)
+	{
+		var dx = (x - lastX) / canvas.height * 20;
+		var dy = (y - lastY) / canvas.height * 20;
+		if ( dx != 0 || dy != 0 )
+			camera.drag( cam, dx, dy );
+		lastX = x;
+		lastY = y;
+	}
+
 
 	function initMouseHandling(canvas)
 	{
-		var lastX = -1;
-		var lastY = -1;
-		var dragging = false;
  
-		canvas.onmousedown = function(ev) {  //Mouse is pressed
+		canvas.onmousedown = function(ev) {
 			var x = ev.clientX;
 			var y = ev.clientY;
 			var rect = ev.target.getBoundingClientRect();
@@ -398,20 +411,31 @@
 			dragging = true;
 		}
  
-		canvas.onmouseup = function(ev){ //Mouse is released
+		canvas.onmouseup = function(ev){
+			dragging = false;
+		}
+
+		canvas.ontouchdown = function(ev) {
+			dragging = true;
+		}
+
+		canvas.ontouchup = function(ev) {
 			dragging = false;
 		}
  
-		canvas.onmousemove = function(ev) { //Mouse is moved
+		canvas.onmousemove = function(ev) {
 			var x = ev.clientX;
 			var y = ev.clientY;
 			if(dragging) {
-				var dx = (x - lastX) / canvas.height * 20;
-				var dy = (y - lastY) / canvas.height * 20;
-				if ( dx != 0 || dy != 0 )
-					camera.drag( cam, dx, dy );
-				lastX = x;
-				lastY = y;
+				drag(canvas, x, y);
+			}
+		}
+
+		canvas.ontouchmove = function(ev) {
+			var x = ev.clientX;
+			var y = ev.clientY;
+			if ( dragging) {
+				drag(canvas, x, y);
 			}
 		}
 	}
