@@ -69,13 +69,14 @@
 			.container {
 				position: relative;
 			}
-			#overlay {
+			#gateselection {
 				position: absolute;
 				left: 10px;
 				top: 10px;
 				background-color: rgba(0, 0, 0, 0.7);
 				color: white;
 				font-family: monospace;
+				font-size: 18;
 				padding: 1em;
 			}
 		</style>
@@ -90,10 +91,20 @@
 		<div class="container">
 			<canvas id="webgl_hadamard" width="800" height="800"></canvas>
 			<div id="overlay">
-				<input type="radio" name="gate" value="hadamard" checked>Hadamard<br>
-				<input type="radio" name="gate" value="paulix"          >Pauli X<br>
-				<input type="radio" name="gate" value="s"               >S<br>
-				<input type="radio" name="gate" value="sdagger"         >S&#x2020;<br>
+				<table id="gateselection">
+					<tr>
+						<td><input type="radio" name="gate" value="hadamard" checked>Hadamard</td>
+						<td><input type="radio" name="gate" value="paulix"          >Pauli X</td>
+					</tr>
+					<tr>
+						<td><input type="radio" name="gate" value="s"               >S</td>
+						<td><input type="radio" name="gate" value="pauliy"          >Pauli Y</td>
+					</tr>
+					<tr>
+						<td><input type="radio" name="gate" value="sdagger"         >S&#x2020;</td>
+						<td><input type="radio" name="gate" value="pauliz"          >Pauli Z</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</body>
@@ -603,10 +614,10 @@
 		var numl = Math.floor( positions0.length / 6 );
 		if ( numl >= 0 )
 		{
-			var draw0 = gate=="hadamard" || gate=="paulix";
-			var draw1 = gate=="paulix";
-			var drawp = gate=="hadamard" || gate=="s" || gate=="sdagger";
-			var drawn = gate=="s" || gate=="sdagger";
+			var draw0 = gate=="hadamard" || gate=="paulix" || gate=="pauliy";
+			var draw1 = gate=="paulix" || gate=="pauliy";
+			var drawp = gate=="hadamard" || gate=="s" || gate=="sdagger" || gate=="pauliz";
+			var drawn = gate=="s" || gate=="sdagger" || gate=="pauliz";
 
 			if ( draw0 )
 			{
@@ -722,7 +733,17 @@
 		else if ( gate == "paulix" )
 		{
 			var ang = t * Math.PI;
+			var ax = vec3.create( [1,0,0] );
+		}
+		else if ( gate == "pauliy" )
+		{
+			var ang = t * Math.PI;
 			var ax = vec3.create( [0,1,0] );
+		}
+		else if ( gate == "pauliz" )
+		{
+			var ang = t * Math.PI;
+			var ax = vec3.create( [0,0,1] );
 		}
 		else if ( gate == "s" )
 		{
