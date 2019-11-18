@@ -198,16 +198,16 @@
 	var vbo_ket0;
 	var vbo_ket1;
 	var vbo_ketp;
-	var vbo_ketn;
+	var vbo_keti;
 	var vbo_trl0;
 	var vbo_trl1;
 	var vbo_trlp;
-	var vbo_trln;
+	var vbo_trli;
 
 	var positions0 = [];
 	var positions1 = [];
 	var positionsp = [];
-	var positionsn = [];
+	var positionsi = [];
 
 	var maxtraillen = 1500;
 
@@ -322,7 +322,7 @@
 		vbo_ket0 = gl.createBuffer();
 		vbo_ket1 = gl.createBuffer();
 		vbo_ketp = gl.createBuffer();
-		vbo_ketn = gl.createBuffer();
+		vbo_keti = gl.createBuffer();
 
 		var s = 0.044;
 		vertsc = [
@@ -344,14 +344,20 @@
 			0,-0.7*s,0, 0,0.7*s,0,
 			0,0,-0.7*s, 0,0,0.7*s,
 		]);
-		vertsn = vertsc.concat( [
-			0,-0.7*s,0, 0,0.7*s,0,
+		vertsi = vertsc.concat( [
+			0,-0.4*s,-0.6*s, 0,0.4*s,-0.6*s,
+			0,0,-0.6*s, 0,0,0.6*s,
+			0,-0.4*s,0.6*s, 0,0,0.6*s,
+			0,-0.2*s,0.9*s, 0,0.2*s,0.9*s,
+			0,0.2*s,0.9*s, 0,-0.2*s,1.2*s, 
+			0,-0.2*s,1.2*s, 0,0.2*s,1.2*s,
+			0,0.2*s,1.2*s, 0,0.2*s,0.9*s,
 		]);
 
 		var numl0 = verts0.length/6;
 		var numl1 = verts1.length/6;
 		var numlp = vertsp.length/6;
-		var numln = vertsn.length/6;
+		var numln = vertsi.length/6;
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_ket0);
 		var arr0 = new Float32Array(verts0);
@@ -374,12 +380,12 @@
 		vbo_ketp.numItems = numlp*2;
 		vbo_ketp.color = [1,0,0,1];
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_ketn);
-		var arrn = new Float32Array(vertsn);
-		gl.bufferData(gl.ARRAY_BUFFER, arrn, gl.STATIC_DRAW);
-		vbo_ketn.itemSize = 3;
-		vbo_ketn.numItems = numln*2;
-		vbo_ketn.color = [1,0.5,0,1];
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo_keti);
+		var arri = new Float32Array(vertsi);
+		gl.bufferData(gl.ARRAY_BUFFER, arri, gl.STATIC_DRAW);
+		vbo_keti.itemSize = 3;
+		vbo_keti.numItems = numln*2;
+		vbo_keti.color = [1,0.5,0,1];
 	}
 
 	var canvas;
@@ -595,13 +601,13 @@
 		drawBuf(vbo_ketp,mkp,gl.LINES);
 
 		// Ket n
-		var knpos = vec3.create( [0,1,0] );
-		mat4.multiplyVec4( rMatrix, [knpos[0], knpos[1], knpos[2], 1], knpos );
-		var mkn = mat4.create();
-		mat4.identity(mkn);
-		vec3.scale(knpos,1.14,xlat);
-		mat4.translate(mkn, xlat);
-		drawBuf(vbo_ketn,mkn,gl.LINES);
+		var kipos = vec3.create( [0,1,0] );
+		mat4.multiplyVec4( rMatrix, [kipos[0], kipos[1], kipos[2], 1], kipos );
+		var mki = mat4.create();
+		mat4.identity(mki);
+		vec3.scale(kipos,1.14,xlat);
+		mat4.translate(mki, xlat);
+		drawBuf(vbo_keti,mki,gl.LINES);
 
 		// Trails
 		if ( positions0.length < maxtraillen )
@@ -609,7 +615,7 @@
 			positions0 = positions0.concat( [ k0pos[0], k0pos[1], k0pos[2] ] );
 			positions1 = positions1.concat( [ k1pos[0], k1pos[1], k1pos[2] ] );
 			positionsp = positionsp.concat( [ kppos[0], kppos[1], kppos[2] ] );
-			positionsn = positionsn.concat( [ knpos[0], knpos[1], knpos[2] ] );
+			positionsi = positionsi.concat( [ kipos[0], kipos[1], kipos[2] ] );
 		}
 		var numl = Math.floor( positions0.length / 6 );
 		if ( numl >= 0 )
@@ -654,13 +660,13 @@
 
 			if ( drawn )
 			{
-				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_trln);
-				var arr = new Float32Array(positionsn);
+				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_trli);
+				var arr = new Float32Array(positionsi);
 				gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW);
 				delete arr;
-				gl.vertexAttribPointer(shader_prog.positionLocation, vbo_trln.itemSize, gl.FLOAT, false, 0, 0);
-				vbo_trln.numItems = numl*2;
-				drawBuf(vbo_trln, iMatrix, gl.LINES);
+				gl.vertexAttribPointer(shader_prog.positionLocation, vbo_trli.itemSize, gl.FLOAT, false, 0, 0);
+				vbo_trli.numItems = numl*2;
+				drawBuf(vbo_trli, iMatrix, gl.LINES);
 			}
 		}
 
@@ -682,7 +688,7 @@
 		positions0.length = 0;
 		positions1.length = 0;
 		positionsp.length = 0;
-		positionsn.length = 0;
+		positionsi.length = 0;
 		age = -0.2;
 	}
 
@@ -779,7 +785,7 @@
 		vbo_trl0 = initBufferTrail([0,0,1,1]);
 		vbo_trl1 = initBufferTrail([0,0.8,0,1]);
 		vbo_trlp = initBufferTrail([1,0,0,1]);
-		vbo_trln = initBufferTrail([1,0.5,0,1]);
+		vbo_trli = initBufferTrail([1,0.5,0,1]);
 
 		vbo_sphe = gl.createBuffer();
 		ibo_sphe = gl.createBuffer();
