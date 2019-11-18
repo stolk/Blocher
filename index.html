@@ -432,8 +432,8 @@
 		}
 
 		canvas.ontouchmove = function(ev) {
-			var x = ev.clientX;
-			var y = ev.clientY;
+			var x = ev.touches[0].clientX;
+			var y = ev.touches[0].clientY;
 			if ( dragging) {
 				drag(canvas, x, y);
 			}
