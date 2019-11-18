@@ -371,6 +371,7 @@
 		vbo_ketn.color = [1,0.5,0,1];
 	}
 
+	var canvas;
 
 	var cam;
 	var iMatrix;
@@ -741,7 +742,7 @@
 
 
 	(function loadWebGL(){
-		var canvas = document.getElementById("webgl_hadamard");
+		canvas = document.getElementById("webgl_hadamard");
 		initGL(canvas);
 		initShaders();
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
