@@ -399,8 +399,17 @@
 	}
 
 
-	function handleTouchEnd(ev) {
+	function handleTouchStart(ev) {
 		ev.preventDefault();
+		var x = ev.touches[0].clientX;
+		var y = ev.touches[0].clientY;
+		lastX = x;
+		lastY = y;
+		dragging = true;
+	}
+
+
+	function handleTouchEnd(ev) {
 		dragging = false;
 	}
 
@@ -411,15 +420,6 @@
 		if ( dragging) {
 			drag(canvas, x, y);
 		}
-	}
-
-
-	function handleTouchStart(ev) {
-		var x = ev.touches[0].clientX;
-		var y = ev.touches[0].clientY;
-		lastX = x;
-		lastY = y;
-		dragging = true;
 	}
 
 
