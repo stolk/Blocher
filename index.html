@@ -399,8 +399,35 @@
 	}
 
 
+	function handleTouchEnd(ev) {
+		ev.preventDefault();
+		dragging = false;
+	}
+
+
+	function handleTouchMove(ev) {
+		var x = ev.touches[0].clientX;
+		var y = ev.touches[0].clientY;
+		if ( dragging) {
+			drag(canvas, x, y);
+		}
+	}
+
+
+	function handleTouchStart(ev) {
+		var x = ev.touches[0].clientX;
+		var y = ev.touches[0].clientY;
+		lastX = x;
+		lastY = y;
+		dragging = true;
+	}
+
+
 	function initMouseHandling(canvas)
 	{
+		canvas.addEventListener('touchstart', handleTouchStart, {passive: false});
+		canvas.addEventListener('touchmove',  handleTouchMove);
+		canvas.addEventListener('touchend',   handleTouchEnd);
  
 		canvas.onmousedown = function(ev) {
 			var x = ev.clientX;
@@ -415,34 +442,11 @@
 			dragging = false;
 		}
 
-		canvas.ontouchstart = function(ev) {
-			var x = ev.touches[0].clientX;
-			var y = ev.touches[0].clientY;
-			lastX = x;
-			lastY = y;
-			dragging = true;
-		}
 
-		canvas.ontouchend = function(ev) {
-			dragging = false;
-		}
-
-		canvas.ontouchcancel = function(ev) {
-			dragging = false;
-		}
- 
 		canvas.onmousemove = function(ev) {
 			var x = ev.clientX;
 			var y = ev.clientY;
 			if(dragging) {
-				drag(canvas, x, y);
-			}
-		}
-
-		canvas.ontouchmove = function(ev) {
-			var x = ev.touches[0].clientX;
-			var y = ev.touches[0].clientY;
-			if ( dragging) {
 				drag(canvas, x, y);
 			}
 		}
