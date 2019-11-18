@@ -104,6 +104,9 @@
 						<td><input type="radio" name="gate" value="sdagger"         >S&#x2020;</td>
 						<td><input type="radio" name="gate" value="pauliz"          >Pauli Z</td>
 					</tr>
+					<tr>
+						<td><input type="radio" name="gate" value="sqrnot"          >&#x221ANOT;</td>
+					</tr>
 				</table>
 			</div>
 		</div>
@@ -622,10 +625,10 @@
 		var numl = Math.floor( positions0.length / 6 );
 		if ( numl >= 0 )
 		{
-			var draw0 = gate=="hadamard" || gate=="paulix" || gate=="pauliy";
-			var draw1 = gate=="paulix" || gate=="pauliy";
+			var draw0 = gate=="hadamard" || gate=="paulix" || gate=="pauliy" || gate=="sqrnot";
+			var draw1 = gate=="paulix" || gate=="pauliy" || gate=="sqrnot";
 			var drawp = gate=="hadamard" || gate=="s" || gate=="sdagger" || gate=="pauliz";
-			var drawn = gate=="s" || gate=="sdagger" || gate=="pauliz";
+			var drawi = gate=="s" || gate=="sdagger" || gate=="pauliz" || gate=="sqrnot";
 
 			if ( draw0 )
 			{
@@ -660,7 +663,7 @@
 				drawBuf(vbo_trlp, iMatrix, gl.LINES);
 			}
 
-			if ( drawn )
+			if ( drawi )
 			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vbo_trli);
 				var arr = new Float32Array(positionsi);
@@ -762,6 +765,11 @@
 		{
 			var ang = -t * Math.PI / 2;
 			var ax = vec3.create( [0,0,1] );
+		}
+		else if ( gate == "sqrnot" )
+		{
+			var ang = t * Math.PI / 2;
+			var ax = vec3.create( [1,0,0] );
 		}
 		drawBloch( ax, ang );
 
