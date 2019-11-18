@@ -415,11 +415,19 @@
 			dragging = false;
 		}
 
-		canvas.ontouchdown = function(ev) {
+		canvas.ontouchstart = function(ev) {
+			var x = ev.touches[0].clientX;
+			var y = ev.touches[0].clientY;
+			lastX = x;
+			lastY = y;
 			dragging = true;
 		}
 
-		canvas.ontouchup = function(ev) {
+		canvas.ontouchend = function(ev) {
+			dragging = false;
+		}
+
+		canvas.ontouchcancel = function(ev) {
 			dragging = false;
 		}
  
